@@ -30,6 +30,9 @@ int msbValue(int n) {
     return (n >> 1); 
 } 
 
+// Rightmost set bit value ie 7 --> 4, 4 --> 4
+    cout << (n & -n); or cout << n & ~(n - 1); // & with 2's complement of n.
+
 // COUT SET BIT
 ---------------
 count = 0
@@ -47,6 +50,21 @@ __builtin_parity(int) -> return true if setbits are odd   000000000111 = true
 
 // use l && ll as postfix in function name for long && long long.
 //     eg. __builtin_popcountl(x) & __builtin_popcountll(x) for long and long long
+
+*min_element(begin(x), end(x));
+*max_element(begin(x), end(x));
+*minmax_element(begin(x), end(x)); // pair<int, int> min, max
+
+next_permutation() // next permutaion of range
+prev_permutation()
+unique() // make unique
+includes() // subsequence
+rotate(v.begin(), v.begin() + 1, v.end()); // rotates by 1, use rbegin, rend for reverse rotation
+for_each(nums.begin(), nums.end(), [](int &n){ n++; }); // perform certion operation on a range.
+
+// Binary search:
+lower_bound() // return iterator of value which is not less then given one.
+upper_bound() // always gives iterator of greater value then given one.
 
 /*Binary Exponintial:
 power function log(n):*/

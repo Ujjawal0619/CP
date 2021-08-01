@@ -29,50 +29,68 @@ const ll mod=1e9+7;
 ll powmod(ll a,ll b) {ll res=1;a%=mod; assert(b>=0); for(;b;b>>=1){if(b&1)res=res*a%mod;a=a*a%mod;}return res;}
 ll gcd(ll a,ll b) { return b?gcd(b,a%b):a;}
 
-int vis[4002];
-int bx;
-int tbl[4002][4002];
-bool flag;
+void heapify(vector<int> &arr, int i) {
+    int n = arr.size();
+    int lChild = i*2 + 1;
+    int rChild = i*2 + 2;
+    int largest = i; // assume parent is largest
 
-void display(vi &v, int k) {
-    int sum = 0, t1 = 0, t2 = 0;
-    for(int i=v.size()-1; i>=0; i--) {
-        if(vis[i] == 0 && sum < k) {
-            sum += v[i];
-            t2++;
-        }
-        else if(vis[i] == 1){
-            cout<<v[i]<<" ";
-            t1++;
-        }
+    if(lChild < n && arr[i] < arr[lChild]) largest = lChild;
+    if(rChild < n && arr[largest] < arr[rChild]) largest = rChild;
+
+    if(i != largest) { // there is a change at ith index (left or right child), so we need 
+        swap(arr[largest], arr[i]);
+        heapify(arr, largest);
     }
-    if(sum >= k)
-        flag = true;
-    bx = min(bx, t2 + t1);
-    // cout<<"box: "<<t1<<':'<<t2;
-    cout<<endl;
 }
 
-bool solve(vi &box, int n, int k, int sum) {
-    if(n <= 0)
-        return 0;
-    if(sum >= k) {
-        display(box, k);
-        return 1;
+void makeHeap(vector<int> &arr) {
+    int n = arr.size();
+
+    for(int i = n/2 - 1; i >= 0; i--) {
+        heapify(arr, i);
     }
-    bool a, b;
-    vis[n-1] = 1;
-    if(tbl[n][min(k, sum + box[n-1])] != -1)
-        a = tbl[n][min(k, sum + box[n-1])];
-    else
-        a = tbl[n][min(k, sum + box[n-1])] = solve(box, n-1, k, sum + box[n-1]);
-    vis[n-1] = 0;
-    if(tbl[n][min(k, sum)] != -1)
-        b = tbl[n][min(k, sum)];
-    else
-        b = tbl[n][min(k, sum)] = solve(box, n-1, k, sum);
-    return a | b;
 }
+
+
+void isSubsetSum(vector<int> &set, int n, int sum, long long &count) {
+    // cout << n << " " << sum << endl;
+    bool subset[n + 1][sum + 1];
+
+    for (int i = 0; i <= n; i++)
+        subset[i][0] = true;
+ 
+    for (int i = 1; i <= sum; i++)
+        subset[0][i] = false;
+ 
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= sum; j++) {
+            if (j < set[i - 1])
+                subset[i][j] = subset[i - 1][j];
+            if (j >= set[i - 1])
+                subset[i][j] = subset[i - 1][j]
+                               || subset[i - 1][j - set[i - 1]];
+        }
+    }
+ 
+       // uncomment this code to print table
+     // for (int i = 0; i <= n; i++)
+     // {
+     //   for (int j = 0; j <= sum; j++) {
+     //        printf ("%4d", subset[i][j]);
+     //   }
+     //   printf("\n");
+     // }
+
+    for(int i = n; i >=0; i--) {
+        // cout<<subset[sum][i]<<endl;
+        if(subset[i][sum]) {
+            count = (++count) % mod;
+        }
+    }
+
+}
+
 
 int main()
 {
@@ -83,28 +101,52 @@ int main()
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
     //code here
-    int  a, b, c, n, m, t, q, k;
+    // int  a, b, c, n, m, t, q, k;
     // int u, v;
+    // cin>>t;
+    // while(t--){
+    //     vi arr;
+    //     cin >> n;
+    //     rep(i,0,n) {
+    //         cin >> a;
+    //         arr.pb(a);
+    //     }
+
+    //     makeHeap(arr);
+    //     vector<int>res;
+    //     while(arr.size()>0)
+    //     {
+    //         res.push_back(arr[0]);
+    //         arr.erase(arr.begin()+0);
+    //         makeHeap(arr);
+
+    //     }
+    //     rep(i,0,res.size())
+    //     {
+    //         cout<<res[i]<<" ";
+    //     }
+
+    // }
+   
+    int t;
+    long long count = 0;
     cin>>t;
+    vector<int> set;
     while(t--){
-        cin>>n>>k;
-        vi boxHeight(n);
-        bx = INT_MAX;
-        flag = false;
-        mst(tbl, -1);
-        a = 0;
-        rep(i,0,n) {
-            cin>>boxHeight[i];
-            a += boxHeight[i];
+        int a, b;
+        cin >> a >> b;
+        
+        if(a == 0) {
+            set.push_back(b);
+        } else if (a == 1) {
+            set.erase(find(set.begin(), set.end(), b));
+        } else {
+            isSubsetSum(set, set.size(), b, count);
+            cout<< count << " ";
+            count = 0;
         }
-        if(a < 2*k) return -1;
-        sort(boxHeight.begin(), boxHeight.end());
-        solve(boxHeight, n, k, 0);
-        if(flag)
-            cout<<bx<<endl;
-        else
-            cout<<-1<<endl;
     }
+
     TC; return 0;
 }
 
