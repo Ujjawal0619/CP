@@ -1634,12 +1634,63 @@ DAY 14: Stack and Queues
 
 3. Largest rectangle in histogram (Do the one pass solution)
 ------------------------------------------------------------
-Two pass: 
-One pass: 
+method 1: at each i find next samll to left, right and calculate area made. (arr[i]*(left+1 - rigth-1 + 1))
+method 2: find and store NSL, NGR using stack and then for each i calculate area. // 3 pass solution 
+int largestRectangleArea(vector<int> &heights) {
+    int n = heights.size();
+    stakc<int> st;
+    int nsl[n], nsr[n];
+    for(int i = 0; i < n; i++) { // finding NSL
+        while(st.size() && heights[st.top()] >= heights[i]) st.pop();
+        if(st.empty()) nsl[i] = 0;
+        else nsl[i] = st.top() + 1;
+        st.push(i);
+    }
+    while(st.size()) st.pop();
+    for(int i = n-1; i >= 0; i--) { // findign NSR
+        while(st.size() && heights[st.top()] >= heights[i]) st.pop();
+        if(st.empty()) nsr[i] = n-1;
+        else nsr[i] = st.top() - 1;
+        st.push(i);
+    }
 
+    int ans = 0;
+    for(int i = 0; i < n; i++)
+        ans = max(ans, heights[i] * (nsr[i] - nsl[i] + 1));
+    return ans;
+}
+method 3: using one pass.
+int largestRectangleArea(vector<int> histo) {
+    stack<int> st;
+    int ans = 0, n = histo.size();
+    for(int i=0; i <= n; i++) {
+        while(st.size() && (i==n || histo[st.top()] >= histo[i])) {
+            int height = histo[st.top()]; // curr as hight
+            st.pop();
+            int width = st.empty()? i: (i - st.top() - 1);
+            ans = max(ans, width*height);
+        }
+        st.push(i);
+    }
+    return ans;
+}
 
 4. // Sliding Window maximum
 ----------------------------
+method 1: nested for loops
+method 2: using deque
+vector<int> maxSlidingWindow(vector<int> &nums, int k) {
+    deque<int> dq; vector<int> ans;
+
+    for(int i = 0; i < nums.size(); i++) {
+        if(dq.size() && dq.front() == i-k) dq.pop_front();
+        while(dq.size() && nums[dq.back()] <= nums[i]) dq.pop_back();
+
+        dq.push_back(i);
+        if(i >= k-1) ans.push_back(nums[dq.front()]);
+    }
+    return ans;
+}
 
 
 5. // Implement Min Stack
