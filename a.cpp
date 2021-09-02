@@ -35,12 +35,12 @@ void heapify(vector<int> &arr, int i) {
     int rChild = i*2 + 2;
     int largest = i; // assume parent is largest
 
-    if(lChild < n && arr[i] < arr[lChild]) largest = lChild;
-    if(rChild < n && arr[largest] < arr[rChild]) largest = rChild;
+    if(lChild < n && arr[largest] < arr[lChild]) largest = lChild; // left child is larger
+    if(rChild < n && arr[largest] < arr[rChild]) largest = rChild; // right child is larger
 
     if(i != largest) { // there is a change at ith index (left or right child), so we need 
-        swap(arr[largest], arr[i]);
-        heapify(arr, largest);
+        swap(arr[largest], arr[i]); // fix the parent
+        heapify(arr, largest); // fix further either of left or right child
     }
 }
 

@@ -178,6 +178,7 @@ int len=100000;
 bool prime[len]; // assuming that all are prime
 vi primelist;
 void sieve(){
+    prime[0] = prime[1] = 1;
     for (int p=2; p*p<=len; p++) // till - 100, since p*p=10000 
     { 
         if (prime[p] == false) // false means is a prime no.
