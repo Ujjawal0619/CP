@@ -168,26 +168,29 @@ void bfs(int node){
 
 // MAXIMUM DEPTH OF BINARY TREE:
 -------------------------------
-int maxDepth(TreeNode *root)
-{
-    return (root==NULL) ? 0 : max(maxDepth(root -> left), maxDepth(root -> right)) + 1;
+int maxDepth(TreeNode *root) {
+    return (root==NULL) ? 0 : 1 + max(maxDepth(root -> left), maxDepth(root -> right));
 }
 
 // SIEVE
+--------
 int len=100000;
 bool prime[len]; // assuming that all are prime
 vi primelist;
-void sieve(){
+void sieve() {
     prime[0] = prime[1] = 1;
-    for (int p=2; p*p<=len; p++) // till - 100, since p*p=10000 
+    for (int p = 2; p*p <= len; p++) // till - 100, since p*p=10000 
     { 
         if (prime[p] == false) // false means is a prime no.
         { 
-            primelist.pb(p);
-            for (int i=p*p; i<=len; i += p) // multiple before p*p already marked
+            for (int i = p*p; i <= len; i += p) // multiple before p*p already marked
                 prime[i] = true; // declearing multiple of 'p' as not prime
         } 
-    } 
+    }
+
+    for(int i = 0; i <= len; i++)
+        if(!prime[i])
+            primelist.pb(i);
 }
 
 // DISJOINT SET UNION:
@@ -245,6 +248,8 @@ void union_set(int u, int v, int par[])
     stree = segment tree.
     arr = elemnts form which segment tree is made.
 */
+
+// Below is implementation of seg tree for min value query
 void build_stree(int si, int ss, int se, int stree[], int arr[])
 {
     if(ss == se) // single element
@@ -264,7 +269,7 @@ void build_stree(int si, int ss, int se, int stree[], int arr[])
 
 int query(int si, int ss, int se, int l, int r, int stree[]){
     // (l<=r) always
-    // if segment tree [ss, se] either left or right only of range[l,r].
+    // if segment [ss, se] completely lie out side of range[l,r].
     if(l > se || r < ss)
         return INT_MAX;
 

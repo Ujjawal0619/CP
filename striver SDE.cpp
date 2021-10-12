@@ -23,8 +23,10 @@ void sortColors2(vector<int>& a) {
     }
 }
 
+// https://leetcode.com/problems/sort-colors/submissions/
+
 2. // Repeat and Missing Number (IB)
--------------------------------
+------------------------------------
 vector<int> findErrorNums(vector<int>& nums) {
     // METHOD 1: 
     /* let 'a', 'b' are repeated, missing number respectively */
@@ -109,18 +111,19 @@ int nextGap(int gap) {
     if (gap <= 1) return 0;
     return (gap / 2) + (gap % 2);
 }
+
 void merge(int* arr1, int* arr2, int n, int m) {
     int i, j, gap = n + m;
     for (gap = nextGap(gap);
          gap > 0; gap = nextGap(gap))
     {
         // comparing elements in the first array.
-        for (i = 0; i + gap < n; i++)
+        for (i = 0; i + gap < n; i++)     //   <----- imp
             if (arr1[i] > arr1[i + gap])
                 swap(arr1[i], arr1[i + gap]);
  
         // comparing elements in both arrays.
-        for (j = gap > n ? gap - n : 0;
+        for (j = gap > n ? gap - n : 0;   //   <----- imp
              i < n && j < m;
              i++, j++)
             if (arr1[i] > arr2[j])
@@ -128,7 +131,7 @@ void merge(int* arr1, int* arr2, int n, int m) {
  
         if (j < m) {
             // comparing elements in the second array.
-            for (j = 0; j + gap < m; j++)
+            for (j = 0; j + gap < m; j++)   //  <----- imp
                 if (arr2[j] > arr2[j + gap])
                     swap(arr2[j], arr2[j + gap]);
         }
@@ -660,6 +663,47 @@ int lengthOfLongestSubstring(string s) {
     return len;
 }
 
+7. // Max Number of K-Sum Pairs
+-------------------------------
+method 1: sort and use two pointer
+int maxOperations(vector<int>& nums, int k) {
+    int i = 0, j = nums.size()-1, ans = 0;
+    sort(nums.begin(), nums.end());
+    while(i < j) {
+        int sum = nums[i] + nums[j];
+        if(sum == k) {
+            ans++;
+            i++;
+            j--;
+        } else {
+            if(sum > k) j--;
+            else i++;
+        } 
+    }
+    return ans;
+}   
+method 2: hashing
+int maxOperations(vector<int> &nums, int k) {
+
+    unordered_map<int, int> mp;
+    for(auto ele: nums) mp[ele]++;
+
+    int ans = 0;
+    for(auto [ele, count]: mp) {
+        int first = ele;
+        int second = k - ele;
+        
+        if(first == second) ans += count/2;
+        else if(mp.find(second) != mp.end()) {
+            int minCount = min(count, mp[second]);
+            ans += minCount;
+            mp[first] -= minCount;
+            mp[second] -= minCount;
+        }
+    }
+    return ans;
+}
+
 
 DAY 5: Linked List
 ==================
@@ -912,7 +956,7 @@ vvi threeSum(vi &num) {
                 res.push_back({nums[i], nums[lo], nums[hi]});
 
                 while(lo < hi && nums[lo] == nums[lo+1]) lo++;
-                while(lo < hi && nums[hi] == nums[hi-1]) hi++;
+                while(lo < hi && nums[hi] == nums[hi-1]) hi--;
                 lo++, hi--;
             }
             else if (nums[lo] + nums[hi] < sum) lo++;
@@ -1432,7 +1476,7 @@ int search(vector<int> &a, int target) {
 }
 
 5. // Median of 2 sorted arrays
---------------------------------
+-------------------------------
 method 1: merge and sort then find middle one.
 method 2: merge using merge sort technique and find middle one.
 method 3: find middle in both sorted insted of merging using two pointer.
@@ -1533,7 +1577,7 @@ int findPages(int A[], int N, int M) {
 }
 
 8. // Aggressive Cows (SPOJ)
----------------------
+----------------------------
 method 1: same as allocate books
 
 DAY 12: Bits
@@ -1625,8 +1669,46 @@ void sortStack(stack<int> &s) {
 DAY 14: Stack and Queues
 ========================
 1. // LRU cache (vvvv. imp)
---------------------------- 
-
+---------------------------
+method 1: use STL List (as deque)
+class LRUCache {
+    list<int> dq; // store keys of cache
+    unordered_map<int, list<int>::iterator> ma; // store references of key in cache
+    int csize; // maximum capacity of cache
+ 
+public:
+    // Declare the size
+    LRUCache(int n) {
+        csize = n;
+    }
+    // Refers key x with in the LRU cache
+    void refer(int x) {
+        // not present in cache
+        if (ma.find(x) == ma.end()) {
+            // cache is full
+            if (dq.size() == csize) {
+                // delete least recently used element
+                int last = dq.back();
+     
+                // Pops the last element
+                dq.pop_back();
+     
+                // Erase the last
+                ma.erase(last);
+            }
+        }
+     
+        // present in cache
+        else
+            dq.erase(ma[x]);
+     
+        // update reference
+        dq.push_front(x);
+        ma[x] = dq.begin();
+    }
+};
+ 
+method 2: make your own deque class using doubly linked list (see leetcode implementation)
 
 2. // LFU Cache (Hard, can be ignored)
 -------------------------------------- 
@@ -1695,14 +1777,100 @@ vector<int> maxSlidingWindow(vector<int> &nums, int k) {
 
 5. // Implement Min Stack
 -------------------------
+method 1: put pair {val, currmin} in stack
+method 2: use modified value to restore previous minimum
+typedef long long ll;
+class MinStack {
+    stack<ll> stk;
+    ll currMin;
+public:
+    MinStack() {
+        currMin = INT_MAX;
+    }
+    
+    void push(int val) {
+        ll x = val;
+        if(stk.size() == 0) {
+            stk.push(x);
+            currMin = x;
+        } else if(x < currMin) {  //      x < currMin    then  push(2*x - currMin) & update currMin
+            stk.push(2*x*1LL - currMin);
+            currMin = x;
+        } else {
+            stk.push(x);
+        }
+    }
+    
+    void pop() {
+        ll y = stk.top(); stk.pop();
+        
+        if(y < currMin)             //   y < currMin   then update currMin = 2*currMin - y
+            currMin = (2*currMin*1LL - y);
+    }
+
+    int top() {
+        ll y = stk.top();
+        
+        if(y < currMin)
+            return currMin; // (2*currMin*1LL);
+        return y;
+    }
+    int getMin() {
+        return currMin;
+    }
+};
+
 
 
 6. // Rotten Orange (Using BFS)
 -------------------------------
+method 1: using bfs
+int orangesRotting(vector<vector<int>> &grid) {
+    if(grid.empty()) return 0;
+    int m = grid.size(), n = grid[0].size(), days = 0, tot = 0, cnt = 0;
+    queue<pair<int, int>> q;
 
+    for(int i = 0; i < m; i++)
+        for(int j = 0; j < n; j++) {
+            if(grid[i][j] !=0) tot++;
+            if(grid[i][j] == 2) q.push({i, j}); // collect rotten
+        }
+
+    int dx[4] = {0, 0, 1, -1}, dy[4] = {1, -1, 0, 0};
+
+    while(q.size()) {
+        int k = q.size(); cnt += k;
+        while(k--) {
+            int x = q.front().first, y = q.front().second; q.pop();
+
+            for(int i = 0; i < 4; i++) {
+                int nx = x + dx[i], ny = y + dy[i];
+                if(nx < 0 || ny < 0 || nx >= m || ny >= n || grid[nx][ny] != 1) continue;
+                grid[nx][ny] = 2;
+                q.push({nx, ny});
+            }
+        }
+        if(q.size()) days++;
+    }
+    return tot == cnt ? days : -1; // if able to rote all or not
+}
 
 7. // Stock Span Problem
 ------------------------
+method 1: using NGL
+vector <int> calculateSpan(int price[], int n) {
+   stack<pair<int, int>> stk;
+   vector<int> ans(n);
+   for(int i = 0; i < n; i++) {
+        while(stk.size() && stk.top().first <= price[i]) stk.pop();
+        if(stk.size())
+            ans[i] = i - stk.top().second;
+        else
+            ans[i] = i+1;
+        stk.push({price[i], i});
+   }
+    return ans;
+}
 
 
 8. // Find maximum of minimums of every window size
@@ -1763,3 +1931,8 @@ for(int i = 0; i < (1 << n)-1; i++) { // till 2^n - 1, all these integers have d
 
 
 rain water trapping: leftprefix, rightprefix
+
+
+
+// LeetCode Questions:
+surrounded-regions
