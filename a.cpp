@@ -28,7 +28,13 @@ const ll mod=1e9+7;
 
 // int rnd(int x) { return mrand() % x;}
 ll powmod(ll a,ll b) {ll res=1;a%=mod; assert(b>=0); for(;b;b>>=1){if(b&1)res=res*a%mod;a=a*a%mod;}return res;}
-ll gcd(ll a,ll b) { return b?gcd(b,a%b):a;}
+ll gcd(ll a, ll b) {
+    while (b) {
+        a = a % b;
+        swap(a, b);
+    }
+    return a;
+}
 
 
 vi seg(40000), arr(10000);
@@ -81,21 +87,16 @@ int main() {
     // int  a, b, c, n, m, t, q, k;
     // int u, v;
     int n, t;
-    cin >> n;
-    for(int i = 0; i < n; i++) {
-        cin >> arr[i];
-    }
-    buildSegmentTree(0, 0, n-1);
+    // cin >> n;
+    // for(int i = 0; i < n; i++) {
+    //     cin >> arr[i];
+    // }
+    // buildSegmentTree(0, 0, n-1);
     cin>>t;
 
     while(t--) {
-        int l, r;
-        cin >> l >> r;
-        if(l == r) {
-            cout << arr[l] << endl;
-            continue;
-        }
-        cout << find(0, 0, n-1, l, r).second << endl;
+        cout << "hello";
     }
     TC; return 0;
 }
+

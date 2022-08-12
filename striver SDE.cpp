@@ -37,7 +37,7 @@ vector<int> findErrorNums(vector<int>& nums) {
     
     for(int ele: nums) {
         sum -= ele;
-        sqrsum -= pow(ele, 2);
+        sqrsum -= (ele*ele);
     }
     // sum contains (a - b)                             --- (1)
     // sqrsum contains (a^2 - b^2) == (a + b)(a - b)    --- (2)
@@ -159,24 +159,23 @@ void kadane(vector<int> arr) {
 method 1: sort and traverse for all overlaped interval for each interval and merge them; TC O(n^2) SC O(n)
 method 2: TC O(n) SC O(n)
 
-vector<vector<int>> merge(vector<vector<int>> intervals) {
-    vector<vector<int>> ans; vector<int> temp; // [a,b]
-    if(intervals.size() == 0) return {};
-
-    sort(intervals.begin(), intervals.end());
-    temp = intervals[0];
-
-    for(auto it: intervals) { // it -> [p,q]
-        if(it[0] <= temp[1]) // if first number of current range lies in between temp
-            temp[1] = max(it[1], temp[1]);
-        else { // starting value of current range is > end of temp
-            ans.push_back(temp);
-            temp = it;
-        }
-    }
-    ans.push_back(temp);
+vector<vector<int>> merge(vector<vector<int>>& intervals) {
+    
+    sort(intervals.begin(), intervals.end(), [&](vector<int> a, vector<int> b) {
+        return a[0] < b[0];
+    });
+     
+    vector<vector<int>> ans;
+    ans.push_back(intervals[0]);
+    
+    for(int i = 1; i < intervals.size(); i++)
+        if(ans.back()[1] >= intervals[i][0])
+            ans.back()[1] = max(ans.back()[1], intervals[i][1]);
+        else
+            ans.push_back(intervals[i]);
     return ans;
 }
+
 
 6. // Find the duplicate in an array of N+1 integers.
 method 1: sort and check i, i+1 are same 
@@ -276,7 +275,7 @@ vector<int> nextPermutaion(vector<int> &arr) {
         for(l = n - 1; l > k; l--)
             if(arr[l] > arr[k]) break;
         swap(arr[k], arr[l]);
-        reverse(arr.begin() + k + 1, arr.end()); // reversing forom k+1 (peak) till end;
+        reverse(arr.begin() + k + 1, arr.end()); // reversing from k+1 (peak) till end;
     }
 }
 
@@ -286,17 +285,16 @@ method 1: use two for loops and cont accordingly
 mehtod 2: use merge sort algorithm
 
 int merge(vector<int> &arr, vector<int> &temp, int left, int mid, int right) {
-    int i, j, k;
     int inv_count = 0;
 
-    i = left, j = mid, k = left;
-    while((i <= mid-1) && (j <= right)) {
-        if(arr[i] <= arr[j]) {
+    int i = left, j = mid, k = left;
+
+    while(i <= mid-1 && j <= right) {
+        if(arr[i] <= arr[j])
             temp[k++] = arr[i++];
-        } else {
+        else {
             temp[k++] = arr[j++];
-            // this is tricky
-            inv_count += (mid - i);
+            inv_count += (mid - i); // this is tricky
         }
     }
 
@@ -314,7 +312,7 @@ int merge(vector<int> &arr, vector<int> &temp, int left, int mid, int right) {
 
 int mergeSort(vector<int> arr, vector<int> &temp, int left, int right) {
     int mid, inv_count = 0;
-    if(right > left)  {
+    if(right > left) {
         mid = (left + right) / 2;
 
         inv_count += mergeSort(arr, temp, left, mid);
@@ -412,6 +410,8 @@ double myPow(double x, int y) {
     if(y<0) ans = (1.0)/(double)ans;
     return ans;
 }
+
+
 
 3. // Majority Element (>N/2 times) 
 -----------------------------------
@@ -1815,6 +1815,7 @@ public:
             return currMin; // (2*currMin*1LL);
         return y;
     }
+    
     int getMin() {
         return currMin;
     }
@@ -1875,30 +1876,201 @@ vector <int> calculateSpan(int price[], int n) {
 
 8. // Find maximum of minimums of every window size
 ---------------------------------------------------
-
+method 1: nested for loop
+method 2: deque
+vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+    vector<int> ans;
+    deque<int> dq;
+    
+    for(int i = 0; i < nums.size(); i++) {
+        if(dq.size() && dq.front() == i-k) dq.pop_front();
+        while(dq.size() && nums[dq.back()] < nums[i]) dq.pop_back();
+        
+        dq.push_back(i);
+        if(i >= k - 1)
+            ans.push_back(nums[dq.front()]);
+    }
+    return ans;
+}
 
 9. // The Celebrity Problem
 ---------------------------
+method 1: brute force
+method 2: using stack
+int celebrity(vector<vector<int> >& M, int n) {
+    stack<int> s;
+    for(int i = 0; i < n; i++) s.push(i);
+    
+    while(s.size() > 1) {
+        int a = s.top(); s.pop();
+        int b = s.top(); s.pop();
+        
+        if(M[a][b]) s.push(b);  // a knows b => a can't be celebrity
+        else s.push(a); 
+    }
+    
+    int cele = s.top();
+    
+    for(int i = 0; i < n; i++)
+        if(i != cele) if(M[i][cele] == 0 || M[cele][i] == 1) {
+            cele = -1;
+    }
+    return cele;
+}
+
+method 3: using two pointer
+int celebrity(vector<vector<int> >& M, int n) {
+    int i = 0, j = n-1;
+    
+    while(i < j)
+        if(M[i][j]) i++; // i konws j => i can't be a cele
+        else j--;
+    
+    int cele = i;
+    
+    for(int k = 0; k < n; k++)
+        if(k != cele) if(M[k][cele] == 0 || M[cele][k] == 1)
+            return -1;
+    
+    return cele;
+}
 
 
+DAY 15: String
+==============
+1. // Reverse Words in a String
+-------------------------------
+2. // Longest Palindrome in a string
+------------------------------------
+method 1: nested for loops, tow for segement and one to check Palindrome
+method 2: Dynamic Programming
+string longestPalindrome(string s) {
+    int n = s.size();
+    bool dp[n][n];
+    
+    memset(dp, false, sizeof dp);
+    int x, y, curr_max = INT_MIN;
+    for(int i = n-1; i >= 0; i--) {
+        for(int j = i; j < n; j++) {
+            
+            if(i == j) dp[i][j] = true; // single char
+            else if(s[i] == s[j]) {
+                if(j-i == 1) dp[i][j] = true; // two adjacent
+                else dp[i][j] = dp[i+1][j-1]; // according to previous res 
+            }
+            
+            if(dp[i][j] && j-i >= curr_max) {
+                curr_max = j - i;
+                x = i;
+                y = j;
+            }
+        }
+    }
+    return s.substr(x, y - x + 1);
+}
+method 3: two pointers
+string longestPalindrome(string s) {
+    int best = 0, l,r;
+    int n = s.size();
+    string ans;
+    // if palindrom is of ODD length
+    for(int i=0; i<n; i++) {
+        l = i; r = i;
+        while(l>=0 && r<n && s[l] == s[r]) {
+            if(best < (r-l+1)) {
+                best = r-l+1;
+                ans = s.substr(l, best);
+            }
+            l--, r++;
+        }
+    }
+    // if Palindrome is of EVEN length
+    for(int i=0; i<n; i++) {
+        l = i; r = i+1;  // only change
+        while(l>=0 && r<n && s[l] == s[r]) {
+            if(best < (r-l+1)) {
+                best = r-l+1;
+                ans = s.substr(l, best);
+            }
+            l--, r++;
+        }
+    }
+    return ans;
+}
+3. // Roman Number to Integer and vice versa
+--------------------------------------------
+string intToRoman(int num) {
+    string sym[] = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+    int val[] = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+    
+    string ans;
+    
+    for(int i = 0; num; i++) {
+        while(num >= val[i]) {
+            ans += sym[i];
+            num -= val[i];
+        }
+    }
+    
+    return ans;
+}
+
+int romanToInt(string s) {
+    unordered_map<char, int> 
+    val={{'I', 1},{'V', 5},{'X', 10},{'L', 50},{'C', 100},{'D', 500},{'M', 1000}};
+    
+    int n = s.size();
+    int ans = val[s[n-1]];
+    
+    for(int i = n-2; i >= 0; i--) {  // from back
+        if(val[s[i]] < val[s[i+1]])  // if current char value is < its next char value then we need to substarct, eg IX = 9
+            ans -= val[s[i]];
+        else
+            ans += val[s[i]];
+    }
+    
+    return ans;
+}
+
+4. // Implement ATOI/STRSTR
+---------------------------
+5. // Longest Common Prefix
+---------------------------
+6. // Rabin Karp
+----------------
 
 
-DAY 15:
-DAY 16:
-DAY 17:
-DAY 18:
-DAY 19:
-DAY 20:
-DAY 21:
-DAY 22:
-DAY 23:
-DAY 24:
-DAY 25:
-DAY 26:
-DAY 27:
-DAY 28:
-DAY 29:
-DAY 30:
+DAY 16: String
+==============
+1. // Prefix Function/Z-Function
+--------------------------------
+2. // KMP algo / LPS(pi) array 
+------------------------------
+3. // Minimum characters needed to be inserted in the beginning to make it palindromic
+--------------------------------------------------------------------------------------
+4. // Check for Anagrams
+------------------------
+5. // Count and Say
+-------------------
+6. // Compare version numbers
+-----------------------------
+
+DAY 17: Binary Tree
+DAY 18: Binary Tree
+DAY 19: Binary Tree
+DAY 20: BST
+DAY 21: BST
+DAY 22: Mixed Questions
+DAY 23: Graph
+DAY 24: Graph
+DAY 25: Dynamic Programming
+DAY 26: Dynamic Programming
+
+************************************
+DAY 27: OS
+DAY 28: DBMS
+DAY 29: CN
+DAY 30: Dream Comes True
 
 // MORE
 

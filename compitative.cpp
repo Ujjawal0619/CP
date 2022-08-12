@@ -22,10 +22,34 @@ typedef vector<vll>               vvll;
 typedef vector<pair<int,int>>     vpii;
 typedef double db;
 const ll mod=1e9+7;
-// swap, reverse(it, it)
-// mt19937 mrand(random_device{}());
 
-// int rnd(int x) { return mrand() % x;}
+// Operator overloads <<, >>
+template<typename T1, typename T2>
+istream &operator>>(istream &istream, pair<T1, T2> &p) {
+    return (istream >> p.first >> p.second);
+} // cin >> pair<T1, T2>
+
+template<typename T>
+istream &operator>>(istream &istream, vector<T> &v) {
+    for (auto &it : v) {
+        cin >> it;
+    }
+    return istream;
+} // cin >> vector<T>
+
+template<typename T1, typename T2>
+ostream &operator<<(ostream &ostream, const pair<T1, T2> &p) {
+    return (ostream << p.first << " " << p.second);
+} // cout << pair<T1, T2>
+
+template<typename T>
+ostream &operator<<(ostream &ostream, const vector<T> &c) {
+    for (auto &it : c) {
+        cout << it << " ";
+    }
+    return ostream;
+} // cout << vector<T>
+
 ll powmod(ll a,ll b) {ll res=1;a%=mod; assert(b>=0); for(;b;b>>=1){if(b&1)res=res*a%mod;a=a*a%mod;}return res;}
 ll gcd(ll a,ll b) { return b?gcd(b,a%b):a;}
 
