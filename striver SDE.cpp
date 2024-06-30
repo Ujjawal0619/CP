@@ -1794,7 +1794,7 @@ public:
             stk.push(x);
             currMin = x;
         } else if(x < currMin) {  //      x < currMin    then  push(2*x - currMin) & update currMin
-            stk.push(2*x*1LL - currMin);
+            stk.push(1LL*2*x - currMin);
             currMin = x;
         } else {
             stk.push(x);
@@ -1805,7 +1805,7 @@ public:
         ll y = stk.top(); stk.pop();
         
         if(y < currMin)             //   y < currMin   then update currMin = 2*currMin - y
-            currMin = (2*currMin*1LL - y);
+            currMin = (1LL*2*currMin - y);
     }
 
     int top() {
@@ -1912,9 +1912,9 @@ int celebrity(vector<vector<int> >& M, int n) {
     int cele = s.top();
     
     for(int i = 0; i < n; i++)
-        if(i != cele) if(M[i][cele] == 0 || M[cele][i] == 1) {
-            cele = -1;
-    }
+        if(i != cele) 
+            if(M[i][cele] == 0 || M[cele][i] == 1) 
+                cele = -1;
     return cele;
 }
 
@@ -2034,6 +2034,7 @@ int romanToInt(string s) {
 
 4. // Implement ATOI/STRSTR
 ---------------------------
+
 5. // Longest Common Prefix
 ---------------------------
 6. // Rabin Karp
